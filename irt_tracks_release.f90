@@ -1,6 +1,6 @@
 ! needs the output of "irt objects" as input file
 ! writes out single cell tracks, ignoring joining and splitting
-! Compile: ifort -no-wrap-margin -o irt_tracks_release.x irt_tracks_release.f90 irt_parameters.f90
+! Compile: gfortran -O0 -o irt_tracks_release.x irt_tracks_release.f90 irt_parameters.f90
 
 PROGRAM irt_tracks
 
@@ -315,8 +315,10 @@ IF (status_backward .NE. 1) THEN
     !	        status_beginning(i),status_end(i),totarea(:,i), &
     !        field_mean(:,i,:),field_min(:,i,:),field_max(:,i,:), &
     !        center_of_mass_x(:,i),center_of_mass_y(:,i),velocity_x(:,i),velocity_y(:,i))
+    !cell_timestep(1,i)=999 ! for debugging
+    status_end(i)=status_forward
     CALL write_output(max_length_of_track,longest_track,counter,n_fields, 1, &
-              cell_timestep(:,i),cell_id(:,i),cell_number(:,i), &
+              cell_timestep(:,i),cell_id(:,i),cell_number(:,i), & 
               cell_age1(:,i),cell_age2(:,i),totarea(:,i), &
 	      field_mean(:,i,:),field_min(:,i,:),field_max(:,i,:), &
               xfirst(:,i),xlast(:,i),yfirst(:,i),ylast(:,i), &
@@ -428,6 +430,16 @@ INTEGER  :: max_j
 
 max_area = 0.
 counter=counter+1
+
+!IF ((status_beginning.EQ.0 .AND. lbl(1).NE.0) .OR. &
+!    (status_beginning.EQ.1 .AND. lbl(1).EQ.0) .OR. &
+!     status_beginning.EQ.2 .AND. slbl(1).EQ.0) THEN
+!  WRITE(*,*) counter,cell_timestep(1),track_length,status_beginning,status_end,lbl(1),slbl(1),lfl(1),slfl(1)
+!ENDIF
+
+!IF (status_end.EQ.2 .AND. slfl(track_length).EQ.0) THEN
+!  WRITE(*,*) counter,cell_timestep(1),track_length,status_beginning,status_end,lbl(1),slbl(1),lfl(1),slfl(1)
+!ENDIF
 
 WRITE (20,*) '*'
 WRITE (20,*) counter,cell_timestep(1),track_length,status_beginning,status_end
